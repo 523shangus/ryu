@@ -298,11 +298,13 @@ class EDA:
             pivot_map = df.pivot(index='연도', columns='지역', values='인구')
             fig, ax = plt.subplots(figsize=(14, 6))
             pivot_map = pivot_map.fillna(0)
-            pivot_map.plot.area(ax=ax)
+            pivot_map.plot.area(ax=ax, legend=True)
             ax.set_title("Population Over Time by Region")
             ax.set_xlabel("Year")
             ax.set_ylabel("Population")
+            ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
             st.pyplot(fig)
+
 
 
 # ---------------------
