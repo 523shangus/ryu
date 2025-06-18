@@ -283,9 +283,10 @@ class EDA:
             df_sorted['증감'] = df_sorted.groupby('지역')['인구'].diff()
             top100 = df_sorted.sort_values('증감', ascending=False).head(100)
             top100_display = top100[['연도', '지역', '인구', '증감']].copy()
-            top100_display['증감'] = top100_display['증감'].map(lambda x: f"{int(x):,}")
-            st.dataframe(top100_display.style.background_gradient(
-                subset=['증감'], cmap='RdBu_r', axis=0))
+            st.dataframe(
+                top100_display.style.format({"증감": "{:,}"}).background_gradient(
+                    subset=['증감'], cmap='RdBu_r', axis=0)
+            )
 
         with tabs[4]:
             st.subheader("📊 Heatmap by Region-Year")
@@ -297,10 +298,6 @@ class EDA:
             ax.set_xlabel("Year")
             ax.set_ylabel("Population")
             st.pyplot(fig)
-
-
-
-
 # ---------------------
 # 페이지 객체 생성
 # ---------------------
