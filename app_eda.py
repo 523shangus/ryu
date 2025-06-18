@@ -208,12 +208,14 @@ class EDA:
     def analyze_population_data(self, file):
         df = pd.read_csv(file)
 
-        # Replace '-' with 0 for Sejong and convert numeric columns
+        # Replace '-' with 0 for Sejong region
         df.loc[df['지역'] == '세종'] = df.loc[df['지역'] == '세종'].replace('-', 0)
+
+        # Convert numeric columns
         for col in ['인구', '출생아수(명)', '사망자수(명)']:
             df[col] = pd.to_numeric(df[col], errors='coerce')
 
-        # 지역 이름 영문 변환 매핑
+        # Map Korean region names to English
         region_map = {
             '서울': 'Seoul', '부산': 'Busan', '대구': 'Daegu', '인천': 'Incheon', '광주': 'Gwangju',
             '대전': 'Daejeon', '울산': 'Ulsan', '세종': 'Sejong', '경기': 'Gyeonggi', '강원': 'Gangwon',
@@ -222,17 +224,17 @@ class EDA:
         }
         df['지역'] = df['지역'].map(region_map).fillna(df['지역'])
 
-        tabs = st.tabs(["Summary", "Yearly Trends", "Regional Trends", "Change Analysis", "Visualization"])
+        tabs = st.tabs(["Summary", "Yearly Trends", "Regional Trends", "Top Changes", "Visualization"])
 
         with tabs[0]:
-            st.subheader("✅ Info / Describe")
+            st.subheader("✅ Dataset Info")
             buffer = io.StringIO()
             df.info(buf=buffer)
             st.text(buffer.getvalue())
             st.dataframe(df.describe())
 
         with tabs[1]:
-            st.subheader("📉 Yearly Trend (National)")
+            st.subheader("📉 National Population Trends")
             nat_df = df[df['지역'] == 'National']
             fig, ax = plt.subplots()
             sns.lineplot(data=nat_df, x='연도', y='인구', marker='o', ax=ax)
@@ -253,7 +255,7 @@ class EDA:
             st.pyplot(fig)
 
         with tabs[2]:
-            st.subheader("🏙️ Regional Change (Last 5Y)")
+            st.subheader("📍 Regional Change (5 Years)")
             last_year = df['연도'].max()
             base_year = last_year - 5
             recent_df = df[df['연도'].isin([base_year, last_year])]
@@ -280,24 +282,20 @@ class EDA:
             ax2.set_xlabel("Growth Rate (%)")
             st.pyplot(fig2)
 
-            st.markdown("> Rapid growth regions show both absolute and relative population increase. Metropolitan areas often lead this trend.")
-
         with tabs[3]:
-            st.subheader("🚀 Top 100 Growth")
+            st.subheader("🚀 Top 100 Annual Changes")
             df_sorted = df[df['지역'] != 'National'].sort_values(['지역', '연도'])
             df_sorted['Change'] = df_sorted.groupby('지역')['인구'].diff()
             top100 = df_sorted.sort_values('Change', ascending=False).head(100)
-            top100_display = top100[['Year', 'Region', 'Population', 'Change']] = top100[['연도', '지역', '인구', 'Change']].copy()
-            top100_display.rename(columns={'연도': 'Year', '지역': 'Region', '인구': 'Population'}, inplace=True)
+            top100_display = top100[['연도', '지역', '인구', 'Change']].copy()
             st.dataframe(
                 top100_display.style.format({"Change": "{:,}"}).background_gradient(
                     subset=['Change'], cmap='RdBu_r', axis=0)
             )
 
         with tabs[4]:
-            st.subheader("📊 Area Chart by Region-Year")
-            pivot_map = df.pivot(index='Year', columns='Region', values='Population')
-            df = df.rename(columns={'연도': 'Year', '지역': 'Region', '인구': 'Population'})
+            st.subheader("📊 Area Chart by Region")
+            pivot_map = df.pivot(index='연도', columns='지역', values='인구')
             fig, ax = plt.subplots(figsize=(14, 6))
             pivot_map = pivot_map.fillna(0)
             pivot_map.plot.area(ax=ax, legend=True)
@@ -306,6 +304,7 @@ class EDA:
             ax.set_ylabel("Population")
             ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
             st.pyplot(fig)
+
 
 # ---------------------
 # 페이지 객체 생성
