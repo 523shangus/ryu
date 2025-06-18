@@ -200,23 +200,20 @@ class Logout:
 # ---------------------
 class EDA:
     def __init__(self):
-        st.title("📈 인구 통계 데이터 분석 (population_trends.csv)")
-        uploaded_pop = st.file_uploader("Population Trends 데이터 업로드", type="csv")
+        st.title("📈 Population Trends Analysis (population_trends.csv)")
+        uploaded_pop = st.file_uploader("Upload population_trends.csv", type="csv")
         if uploaded_pop:
             self.analyze_population_data(uploaded_pop)
 
     def analyze_population_data(self, file):
         df = pd.read_csv(file)
 
-        # 결측치 '-' → 0 (세종 지역만)
         df.loc[df['지역'] == '세종'] = df.loc[df['지역'] == '세종'].replace('-', 0)
 
-        # 수치형 변환
         for col in ['인구', '출생아수(명)', '사망자수(명)']:
             df[col] = pd.to_numeric(df[col], errors='coerce')
 
-        # 탭 UI
-        tabs = st.tabs(["기초 통계", "연도별 추이", "지역별 분석", "변화량 분석", "시각화"])
+        tabs = st.tabs(["Summary", "Yearly Trends", "Regional Trends", "Change Analysis", "Visualization"])
 
         with tabs[0]:
             st.subheader("✅ Info / Describe")
@@ -234,7 +231,6 @@ class EDA:
             ax.set_xlabel("Year")
             ax.set_ylabel("Population")
 
-            # 간단 예측
             recent = nat_df.sort_values('연도').tail(3)
             birth_avg = recent['출생아수(명)'].mean()
             death_avg = recent['사망자수(명)'].mean()
@@ -254,22 +250,22 @@ class EDA:
             recent_df = df[df['연도'].isin([base_year, last_year])]
             pivot = recent_df.pivot(index='지역', columns='연도', values='인구')
             pivot = pivot.drop('전국', errors='ignore')
-            pivot['증가량'] = pivot[last_year] - pivot[base_year]
-            pivot['증가율'] = pivot['증가량'] / pivot[base_year] * 100
+            pivot['Change'] = pivot[last_year] - pivot[base_year]
+            pivot['GrowthRate'] = pivot['Change'] / pivot[base_year] * 100
 
-            sorted_df = pivot.sort_values('증가량', ascending=False)
+            sorted_df = pivot.sort_values('Change', ascending=False)
 
             fig, ax = plt.subplots(figsize=(10, 8))
-            sns.barplot(x=sorted_df['증가량']/1000, y=sorted_df.index, ax=ax)
-            for i, v in enumerate(sorted_df['증가량']/1000):
+            sns.barplot(x=sorted_df['Change']/1000, y=sorted_df.index, ax=ax)
+            for i, v in enumerate(sorted_df['Change']/1000):
                 ax.text(v, i, f"{v:,.0f}", va='center')
             ax.set_title("Population Change (5Y)")
             ax.set_xlabel("Change (thousands)")
             st.pyplot(fig)
 
             fig2, ax2 = plt.subplots(figsize=(10, 8))
-            sns.barplot(x=sorted_df['증가율'], y=sorted_df.index, ax=ax2)
-            for i, v in enumerate(sorted_df['증가율']):
+            sns.barplot(x=sorted_df['GrowthRate'], y=sorted_df.index, ax=ax2)
+            for i, v in enumerate(sorted_df['GrowthRate']):
                 ax2.text(v, i, f"{v:.1f}%", va='center')
             ax2.set_title("Population Growth Rate (%)")
             ax2.set_xlabel("Growth Rate (%)")
@@ -280,16 +276,16 @@ class EDA:
         with tabs[3]:
             st.subheader("🚀 Top 100 Growth")
             df_sorted = df[df['지역'] != '전국'].sort_values(['지역', '연도'])
-            df_sorted['증감'] = df_sorted.groupby('지역')['인구'].diff()
-            top100 = df_sorted.sort_values('증감', ascending=False).head(100)
-            top100_display = top100[['연도', '지역', '인구', '증감']].copy()
+            df_sorted['Change'] = df_sorted.groupby('지역')['인구'].diff()
+            top100 = df_sorted.sort_values('Change', ascending=False).head(100)
+            top100_display = top100[['연도', '지역', '인구', 'Change']].copy()
             st.dataframe(
-                top100_display.style.format({"증감": "{:,}"}).background_gradient(
-                    subset=['증감'], cmap='RdBu_r', axis=0)
+                top100_display.style.format({"Change": "{:,}"}).background_gradient(
+                    subset=['Change'], cmap='RdBu_r', axis=0)
             )
 
         with tabs[4]:
-            st.subheader("📊 Heatmap by Region-Year")
+            st.subheader("📊 Area Chart by Region-Year")
             pivot_map = df.pivot(index='연도', columns='지역', values='인구')
             fig, ax = plt.subplots(figsize=(14, 6))
             pivot_map = pivot_map.fillna(0)
@@ -298,6 +294,7 @@ class EDA:
             ax.set_xlabel("Year")
             ax.set_ylabel("Population")
             st.pyplot(fig)
+
 # ---------------------
 # 페이지 객체 생성
 # ---------------------
