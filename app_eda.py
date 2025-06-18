@@ -202,18 +202,8 @@ class Logout:
 # ---------------------
 class EDA:
     def __init__(self):
-        st.title("📊 EDA 분석")
-
-        # 기존 Bike Sharing EDA
-        uploaded_bike = st.file_uploader("Bike Sharing Demand 데이터 업로드 (train.csv)", type="csv")
-        if uploaded_bike:
-            self.analyze_bike_data(uploaded_bike)
-
-        st.markdown("---")
-
-        # 새로운 population_trends 분석
-        st.subheader("📈 인구 통계 데이터 분석 (population_trends.csv)")
-        uploaded_pop = st.file_uploader("Population Trends 데이터 업로드", type="csv", key="pop")
+        st.title("📈 인구 통계 데이터 분석 (population_trends.csv)")
+        uploaded_pop = st.file_uploader("Population Trends 데이터 업로드", type="csv")
         if uploaded_pop:
             self.analyze_population_data(uploaded_pop)
 
@@ -267,6 +257,7 @@ class EDA:
             ax.set_xlabel("연도")
             ax.set_ylabel("전체 인구")
             st.pyplot(fig)
+
 
 
 # ---------------------
