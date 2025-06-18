@@ -240,7 +240,7 @@ class EDA:
             sns.lineplot(data=nat_df, x='연도', y='인구', marker='o', ax=ax)
             ax.set_title("Population Over Time")
             ax.set_xlabel("Year")
-            ax.set_ylabel("Population")
+            ax.set_ylabel("Region")
 
             recent = nat_df.sort_values('연도').tail(3)
             birth_avg = recent['출생아수(명)'].mean()
@@ -267,7 +267,7 @@ class EDA:
             sorted_df = pivot.sort_values('Change', ascending=False)
 
             fig, ax = plt.subplots(figsize=(10, 8))
-            sns.barplot(x=sorted_df['Change']/1000, y=sorted_df.index, ax=ax)
+            sns.barplot(x=sorted_df['Change']/1000, y=sorted_df.index.astype(str), ax=ax)
             for i, v in enumerate(sorted_df['Change']/1000):
                 ax.text(v, i, f"{v:,.0f}", va='center')
             ax.set_title("Population Change (5Y)")
@@ -275,7 +275,7 @@ class EDA:
             st.pyplot(fig)
 
             fig2, ax2 = plt.subplots(figsize=(10, 8))
-            sns.barplot(x=sorted_df['GrowthRate'], y=sorted_df.index, ax=ax2)
+            sns.barplot(x=sorted_df['GrowthRate'], y=sorted_df.index.astype(str), ax=ax2)
             for i, v in enumerate(sorted_df['GrowthRate']):
                 ax2.text(v, i, f"{v:.1f}%", va='center')
             ax2.set_title("Population Growth Rate (%)")
@@ -304,7 +304,6 @@ class EDA:
             ax.set_ylabel("Population")
             ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
             st.pyplot(fig)
-
 
 # ---------------------
 # 페이지 객체 생성
