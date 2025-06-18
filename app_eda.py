@@ -42,30 +42,30 @@ if "logged_in" not in st.session_state:
 # ---------------------
 class Home:
     def __init__(self, login_page, register_page, findpw_page):
-        st.title("🏠 Home")
+        st.title("🏠 Population Trends of Korea")
 
         if st.session_state.get("logged_in"):
-            st.success(f"Welcome, {st.session_state.get('user_email')}!")
+            st.success(f"환영합니다, {st.session_state.get('user_email')}님!")
 
         st.markdown("""
         ---
-        ### 📊 About This App
-        This web app allows you to upload and analyze population trends from a CSV file.
+        ### 📊 이 앱에 대하여
+       csv파일을 업로드하여 대한민국의 인구 변화 추이를 확인합니다.
 
-        **Key Features:**
-        - Handle missing values and data formatting
-        - View national population trends over the years
-        - Analyze regional population changes and growth rates
-        - Visualize trends with interactive charts and color-coded tables
+       **주요 기능:**
+- 결측치 처리 및 수치 데이터 변환
+- 전국 인구의 연도별 추세 분석
+- 지역별 인구 변화 및 증가율 분석
+- 상위 변화 지역 테이블 및 누적 영역 그래프 제공
 
-        **Data Format Expected (column names in Korean):**
-        - `연도` (Year)
-        - `지역` (Region)
-        - `인구` (Population)
-        - `출생아수(명)` (Number of births)
-        - `사망자수(명)` (Number of deaths)
+**데이터 형식 (CSV 파일, 열 이름은 한글로 입력):**
+- `연도`: 조사 연도
+- `지역`: 시·도 단위 지역명
+- `인구`: 해당 지역의 총인구
+- `출생아수(명)`: 해당 연도의 출생자 수
+- `사망자수(명)`: 해당 연도의 사망자 수
 
-        Upload your `population_trends.csv` file in the EDA section to begin analysis.
+EDA 메뉴에서 `population_trends.csv` 파일을 업로드하여 분석을 시작하세요.
         """)
 
 
