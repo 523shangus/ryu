@@ -287,7 +287,8 @@ class EDA:
             df_sorted = df[df['지역'] != 'National'].sort_values(['지역', '연도'])
             df_sorted['Change'] = df_sorted.groupby('지역')['인구'].diff()
             top100 = df_sorted.sort_values('Change', ascending=False).head(100)
-            top100_display = top100[['연도', '지역', '인구', 'Change']].copy()
+            top100_display = top100[['Year', 'Region', 'Population', 'Change']] = top100[['연도', '지역', '인구', 'Change']].copy()
+            top100_display.rename(columns={'연도': 'Year', '지역': 'Region', '인구': 'Population'}, inplace=True)
             st.dataframe(
                 top100_display.style.format({"Change": "{:,}"}).background_gradient(
                     subset=['Change'], cmap='RdBu_r', axis=0)
@@ -295,7 +296,8 @@ class EDA:
 
         with tabs[4]:
             st.subheader("📊 Area Chart by Region-Year")
-            pivot_map = df.pivot(index='연도', columns='지역', values='인구')
+            pivot_map = df.pivot(index='Year', columns='Region', values='Population')
+            df = df.rename(columns={'연도': 'Year', '지역': 'Region', '인구': 'Population'})
             fig, ax = plt.subplots(figsize=(14, 6))
             pivot_map = pivot_map.fillna(0)
             pivot_map.plot.area(ax=ax, legend=True)
@@ -304,8 +306,6 @@ class EDA:
             ax.set_ylabel("Population")
             ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
             st.pyplot(fig)
-
-
 
 # ---------------------
 # 페이지 객체 생성
