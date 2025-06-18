@@ -222,7 +222,7 @@ class EDA:
             '충북': 'Chungbuk', '충남': 'Chungnam', '전북': 'Jeonbuk', '전남': 'Jeonnam',
             '경북': 'Gyeongbuk', '경남': 'Gyeongnam', '제주': 'Jeju', '전국': 'National'
         }
-        df['지역'] = df['지역'].map(region_map).fillna(df['지역'])
+        df['Region'] = df['Region'].map(region_map).fillna(df['Region'])
 
         tabs = st.tabs(["Summary", "Yearly Trends", "Regional Trends", "Top Changes", "Visualization"])
 
@@ -304,6 +304,7 @@ class EDA:
             ax.set_ylabel("Population")
             ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
             st.pyplot(fig)
+
 
 # ---------------------
 # 페이지 객체 생성
